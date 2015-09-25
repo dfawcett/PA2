@@ -9,6 +9,9 @@
 #include "sort.h"
 #include <iostream>
 #include <tgmath.h>
+#include <deque>
+
+using namespace std;
 
 const int base = 10; 
 int digit(int k, int num)
@@ -18,51 +21,72 @@ int digit(int k, int num)
 	return r % base;
 }
 
+deque<int> mergeArr(deque<int> A,deque<int> B){
+    deque <int> AB(A.size()+B.size());
+    for (int i=B.size()-1; i>=0; i--){
+        AB.push_front(B[i]);
+    }
+    for (int i= 0; i<A.size(); i++){
+        AB.push_front(A[i]);
+    }
+    
+    return AB;
+}
+
+void radixsort(deque<int>& A, int size){
+    int d = 5; //radix sort can sort up to 2^15-1 = 32767
+    int i, j, m;
+    int *C = new int[base];
+    int *B = new int[size];
+    for(m = 0; m < d; m++){
+        for(i = 0; i < base; i++) C[i] = 0;
+        for(j = 0; j < size; j++) C[digit(m, A[j])]++;
+        for(i = 1; i < base; i++) C[i] += C[i-1];
+        for(j = size-1; j >= 0; j--){
+            i = C[digit(m, A[j])]--;
+            i--;
+            B[i] = A[j];
+        }
+        for (j=0; j<size; j++) A[j] = B[j];
+    }
+    delete[] B; delete[] C;
+    
+}
+
+
 void
 RadixSort::sort(int A[], int size)
 {
-	int d = 10;
-  /*
-     Complete this function with the implementation of radix sort
-     algorithm.
-  */
-  // int* input = A;
-  // long count[256];
-  // int shift = 0;
-  // int* tmp_array = new int[size];
-  // while(shift < 32){
-  // 	memset(count, 0, sizeof(count));
-  // 	for(int i = 0;  i < size; ++i){
-  // 		int bits = (input[i] >> shift) & 255;
-  // 		count[bits]++;
-  // 	}
-  // 	for(int i = 1; i < 256; ++i){
-  // 		count[i] += count[i];
-  // 	}
-  // 	for(int i = size; i >= 0; i--){
-  // 		int bits = (input[i] >> shift) & 255;
-  // 		count[bits];
-  // 		tmp_array[count[bits]] = input[i];
-  // 	}
-  // 	memcpy(input, tmp_array, size*sizeof(input));
-  // 	shift += 8;
-  // }
-  // delete[] tmp_array;
-	int i, j, m;
-	int *C = new int[base];
-	int *B = new int[size];
-	for(m = 0; m < d; m++){
-		for(i = 0; i < base; i++) C[i] = 0;
-		for(j = 0; j < size; j++) C[digit(m, A[j])]++; 
-		for(i = 1; i < base; i++) C[i] += C[i-1];
-		for(j = size-1; j >= 0; j--){
-			i = C[digit(m, A[j])]--;
-			i--;
-			B[i] = A[j];
-		}
-		for (j=0; j<size; j++) A[j] = B[j];
-	}
-	delete[] B; delete[] C;
+    deque<int> positive;
+    deque<int> negative;
+    
+    for (int e=0; e<size; e++){
+        if (A[e]<0) {
+            negative.push_back(A[e]);
+        } else {
+            positive.push_back(A[e]);
+        }
+    }
+    
+    radixsort(positive,positive.size());
+    
+    //sorting negative, make it positive and insert inversely
+    for (int i=0; i<negative.size();i++){
+        negative[i]*=-1;
+    }
+    radixsort(negative,negative.size());
+    
+    for (int i=0; i<negative.size();i++){
+        negative[i]*=-1;
+    }
+    
+    deque<int> result(size);
+    result=mergeArr(negative,positive);
+    positive.clear(); positive.shrink_to_fit();
+    negative.clear(); negative.shrink_to_fit();
+    copy(result.begin(), result.end(),A);
+    
+  
 }
 
 
