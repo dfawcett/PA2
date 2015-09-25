@@ -22,10 +22,16 @@ int digit(int k, int num)
 }
 
 deque<int> mergeArr(deque<int> A,deque<int> B){
-    deque <int> AB(A.size()+B.size());
+    deque <int> AB;
+    /*
     for (int i=B.size()-1; i>=0; i--){
         AB.push_front(B[i]);
+    }*/
+    
+    for (int i=0; i<B.size(); i++){
+        AB.push_back(B[i]);
     }
+    
     for (int i= 0; i<A.size(); i++){
         AB.push_front(A[i]);
     }
@@ -57,38 +63,47 @@ void radixsort(deque<int>& A, int size){
 void
 RadixSort::sort(int A[], int size)
 {
-    deque<int> positive;
-    deque<int> negative;
-    
-    for (int e=0; e<size; e++){
-        if (A[e]<0) {
-            negative.push_back(A[e]);
-        } else {
-            positive.push_back(A[e]);
+    try{
+        deque<int> positive;
+        deque<int> negative;
+        
+        for (int e=0; e<size; e++){
+            if(A[e]<-32768 || A[e]>32767) throw ("Invalid input, Radix sort can only take numbers -2^15 to 2^15-1");
+            if (A[e]<0) {
+                negative.push_back(A[e]);
+            } else {
+                positive.push_back(A[e]);
+            }
         }
+        if (positive.size()>1){
+            radixsort(positive,positive.size());
+        }
+        //sorting negative, make it positive and insert inversely
+        if (negative.size()>1){
+            for (int i=0; i<negative.size();i++){
+                negative[i]*=-1;
+            }
+            radixsort(negative,negative.size());
+            
+            for (int i=0; i<negative.size();i++){
+                negative[i]*=-1;
+            }
+        }
+        
+        deque<int> result(size);
+        result=mergeArr(negative,positive);
+        
+        positive.clear(); positive.shrink_to_fit();
+        negative.clear(); negative.shrink_to_fit();
+        
+        copy(result.begin(), result.end(),A);
+        
+    } catch(char const* msg){
+        cout<<"Error: "<<msg<<endl;
+        exit(EXIT_FAILURE);
     }
     
-    radixsort(positive,positive.size());
-    
-    //sorting negative, make it positive and insert inversely
-    for (int i=0; i<negative.size();i++){
-        negative[i]*=-1;
-    }
-    radixsort(negative,negative.size());
-    
-    for (int i=0; i<negative.size();i++){
-        negative[i]*=-1;
-    }
-    
-    deque<int> result(size);
-    result=mergeArr(negative,positive);
-    positive.clear(); positive.shrink_to_fit();
-    negative.clear(); negative.shrink_to_fit();
-    copy(result.begin(), result.end(),A);
-    
-  
 }
-
 
 
 
