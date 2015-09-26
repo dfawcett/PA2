@@ -10,8 +10,10 @@
 #include <iostream>
 #include <tgmath.h>
 #include <deque>
+//#include <fstream>
 
 using namespace std;
+//ofstream out;
 
 const int base = 10; 
 int digit(int k, int num)
@@ -21,6 +23,7 @@ int digit(int k, int num)
 	return r % base;
 }
 
+//deque <int>::reverse_iterator riter;
 deque<int> mergeArr(deque<int> A,deque<int> B){
     deque <int> AB;
     /*
@@ -35,7 +38,13 @@ deque<int> mergeArr(deque<int> A,deque<int> B){
     for (int i= 0; i<A.size(); i++){
         AB.push_front(A[i]);
     }
-    
+	/*
+	out.open("100000_dec_output.txt");
+	out<<"100000\n";
+    for(riter=AB.rbegin(); riter!=AB.rend(); ++riter) {
+        out << *riter << endl; // generate output in decreasing order
+	}
+	out.close();   */
     return AB;
 }
 
